@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <title>BuscaFarma - Produto</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- CSS -->
+  <link href="https://fonts.googleapis.com/css?family=Rubik:400,700|Crimson+Text:400,400i" rel="stylesheet">
+  <link rel="stylesheet" href="fonts/icomoon/style.css">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/magnific-popup.css">
+  <link rel="stylesheet" href="css/jquery-ui.css">
+  <link rel="stylesheet" href="css/owl.carousel.min.css">
+  <link rel="stylesheet" href="css/owl.theme.default.min.css">
+  <link rel="stylesheet" href="css/aos.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Estilização do modal para exibir a bula */
+    #bula-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      overflow: auto;
+    }
+    #bula-modal-content {
+      position: relative;
+      margin: 10% auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      max-width: 800px;
+      text-align: center;
+    }
+    #bula-iframe {
+      width: 100%;
+      height: 400px;
+      border: none;
+    }
+    #bula-close {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 30px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="site-wrap">
+    <!-- Navbar -->
+    <div class="site-navbar py-2">
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="logo">
+            <a href="index.html" class="js-logo-clone">BuscaFarma</a>
+          </div>
+          <div class="main-nav d-none d-lg-block">
+            <nav class="site-navigation text-right text-md-center" role="navigation">
+              <ul class="site-menu js-clone-nav d-none d-lg-block">
+                <li class="active"><a href="index.html">Início</a></li>
+                 
+                <li><a href="about.html">Sobre</a></li>
+                <li><a href="contact.html">Contatos</a></li>
+                <li><a href="Login.html">Login</a></li>
+              </ul>
+            </nav>
+          </div>
+          <div class="icons">
+            <a href="#" class="icons-btn d-inline-block js-search-open"><span class="icon-search"></span></a>
+            <a href="cart.html" class="icons-btn d-inline-block bag">
+              <span class="icon-shopping-bag"></span>
+              <span class="number">2</span>
+            </a>
+            <a href="#" class="site-menu-toggle js-menu-toggle ml-3 d-inline-block d-lg-none"><span class="icon-menu"></span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="bg-light py-3">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12 mb-0">
+            <a href="index.html">Início</a> <span class="mx-2 mb-0">/</span> 
+            <strong class="text-black" id="breadcrumb-name">Produto</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Produto Detalhado -->
+    <div class="site-section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-5 mr-auto">
+            <div class="border text-center">
+              <img id="produto-imagem" src="https://via.placeholder.com/300" alt="Produto" class="img-fluid p-5">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h2 class="text-black" id="produto-nome">Carregando...</h2>
+            <p id="produto-descricao">Carregando descrição...</p>
+            <p><strong class="text-primary h4" id="produto-preco">R$ --</strong></p>
+            <p><strong>Categoria:</strong> <span id="produto-categoria">--</span></p>
+            <p><strong>Marca:</strong> <span id="produto-marca">--</span></p>
+            <p><strong>Validade:</strong> <span id="produto-validade">--</span></p>
+            <p><a id="produto-bula" href="#" class="btn btn-sm height-auto px-4 py-3 btn-primary" onclick="abrirBula(event)">Visualizar Bula</a></p>
+            <div id="farmacia-mais-proxima"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal da Bula -->
+    <div id="bula-modal">
+      <div id="bula-modal-content">
+        <span id="bula-close" onclick="fecharBula()">&times;</span>
+        <iframe id="bula-iframe" src=""></iframe>
+        <p id="bula-msg" style="display:none;">Bula não disponível.</p>
+      </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBTaKdJDxa_z8i0isR0Eijp0PSRRfG6CAU",
+        authDomain: "bi-solucoes.firebaseapp.com",
+        projectId: "bi-solucoes",
+        storageBucket: "bi-solucoes.firebasestorage.app",
+        messagingSenderId: "761304787557",
+        appId: "1:761304787557:web:f4ff7f285ffb5792bab48c",
+        measurementId: "G-6DNLBKCWXB"
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+
+      async function carregarProduto() {
+        const produtoID = new URLSearchParams(window.location.search).get('id');
+        if (!produtoID) return;
+
+        try {
+          const produtoDoc = await db.collection('produtos').doc(produtoID).get();
+          if (!produtoDoc.exists) return;
+          const produto = produtoDoc.data();
+
+          document.getElementById("produto-nome").innerText = produto.nome;
+          document.getElementById("produto-descricao").innerText = produto.descricao;
+          document.getElementById("produto-preco").innerText = `R$ ${produto.preco || '--'}`;
+          document.getElementById("produto-categoria").innerText = produto.categoria;
+          document.getElementById("produto-marca").innerText = produto.marca;
+          document.getElementById("produto-validade").innerText = produto.validade;
+          document.getElementById("produto-imagem").src = produto.imagem || "https://via.placeholder.com/300";
+          document.getElementById("produto-bula").href = produto.bula || "#";
+
+          buscarFarmaciaProxima(produtoID);
+        } catch (e) { console.error(e); }
+      }
+
+      function abrirBula(event) {
+        event.preventDefault();
+        const url = document.getElementById("produto-bula").href;
+        document.getElementById("bula-iframe").src = url || "#";
+        document.getElementById("bula-modal").style.display = "block";
+      }
+
+      function fecharBula() {
+        document.getElementById("bula-modal").style.display = "none";
+      }
+
+      async function buscarFarmaciaProxima(produtoID) {
+        try {
+          const estoque = await db.collection('estoque').where('idProduto', '==', produtoID).get();
+          if (estoque.empty) return;
+
+          const farmacia = estoque.docs[0].data();
+          document.getElementById("farmacia-mais-proxima").innerHTML = `
+            <h4>Farmácia Mais Próxima</h4>
+            <p><strong>${farmacia.nomeFarmacia || 'Não Disponível'}</strong></p>
+            <p>${farmacia.endereco || 'Endereço indisponível'}</p>
+          `;
+        } catch (e) { console.error(e); }
+      }
+
+      document.addEventListener("DOMContentLoaded", carregarProduto);
+    </script>
+  </div>
+</body>
+
+</html>

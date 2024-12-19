@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Buscafarma </title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link href="https://fonts.googleapis.com/css?family=Rubik:400,700|Crimson+Text:400,400i" rel="stylesheet">
+  <link rel="stylesheet" href="fonts/icomoon/style.css">
+
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/magnific-popup.css">
+  <link rel="stylesheet" href="css/jquery-ui.css">
+  <link rel="stylesheet" href="css/owl.carousel.min.css">
+  <link rel="stylesheet" href="css/owl.theme.default.min.css">
+  <link rel="stylesheet" href="css/aos.css">
+  <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+  <div class="site-wrap">
+
+    <div class="site-navbar py-2">
+
+      <div class="search-wrap">
+        <div class="container">
+          <a href="#" class="search-close js-search-close"><span class="icon-close2"></span></a>
+          <form action="#" method="post">
+            <input type="text" class="form-control" placeholder="pesquise a palavra-chave e pressione Enter...">
+          </form>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="logo">
+            <div class="site-logo">
+              <a href="index.html" class="js-logo-clone">Buscafarma</a>
+            </div>
+          </div>
+          <div class="main-nav d-none d-lg-block">
+            <nav class="site-navigation text-right text-md-center" role="navigation">
+              <ul class="site-menu js-clone-nav d-none d-lg-block">
+                <li class="active"><a href="index.html">ínicio</a></li>
+                <li><a href="shop.html">Loja</a></li>
+                <li><a href="about.html">Sobre</a></li>
+                <li><a href="contact.html">Contatos</a></li> 
+                <li><a href="Login.html">Login</a></li>
+              </ul>
+            </nav>
+          </div>
+          <div class="icons">
+            <a href="#" class="icons-btn d-inline-block js-search-open"><span class="icon-search"></span></a>
+            <a href="cart.html" class="icons-btn d-inline-block bag">
+              <span class="icon-shopping-bag"></span>
+              <span class="number">2</span>
+            </a>
+            <a href="#" class="site-menu-toggle js-menu-toggle ml-3 d-inline-block d-lg-none"><span class="icon-menu"></span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="site-blocks-cover" style="background-image: url('images/hero_1.jpg');">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-7 mx-auto order-lg-2 align-self-center">
+            <div class="site-block-cover-content text-center">
+              <h2 class="sub-title">Medicina eficaz, nova medicina todos os dias</h2>
+              <h1>Bem-Vindo à Buscafarma</h1>
+              <p>
+                <a href="#" class="btn btn-primary px-5 py-3">Comprar Agora</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="site-section">
+      <div class="container">
+        <div class="row">
+          <div class="title-section text-center col-12">
+            <h2 class="text-uppercase">Produtos Populares</h2>
+          </div>
+        </div>
+
+        <div class="row" id="produtos-populares">
+          <!-- Os produtos serão carregados aqui dinamicamente -->
+        </div>
+        <div class="row mt-5">
+          <div class="col-12 text-center">
+            <a href="shop.html" class="btn btn-primary px-4 py-3">Ver mais produtos</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 col-lg-3 mb-4 mb-lg-0">
+
+            <div class="block-7">
+              <h3 class="footer-heading mb-4">Sobre Nós</h3>
+               <p>Na Buscafarma, nossa missão é proporcionar aos consumidores uma maneira simples de encontrar e comparar medicamentos. Além de poderem localizar as farmácias mais próximas para adquirir o produto.</p>
+            </div>
+
+          </div>
+          <div class="col-lg-3 mx-auto mb-5 mb-lg-0">
+            <h3 class="footer-heading mb-4">Links úteis</h3>
+            <ul class="list-unstyled">
+         
+              <li><a href="shop.html">Loja</a></li>
+              <li><a href="about.html">Sobre </a></li>
+              <li><a href="contact.html">Contatos</a></li>
+              <li><a href="Login.html">Login</a></li>
+            </ul>
+          </div>
+
+          <div class="col-md-6 col-lg-3">
+            <div class="block-5 mb-5">
+              <h3 class="footer-heading mb-4">Contato</h3>
+              <ul class="list-unstyled">
+                <li class="phone"><a href="tel://23923929210">+55 81 99935-5551</a></li>
+                <li class="email">Buscafarma@Gmail.com</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="row pt-5 mt-5 text-center">
+          <div class="col-md-12">
+            <p>
+              Copyright &copy;
+              <script>document.write(new Date().getFullYear());</script> Todos os Direitos Reservados por BuscaFarma
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+<!-- Firebase SDK - Compatível com navegadores sem ES6 Modules -->
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+
+<script>
+  // Configuração do Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyBTaKdJDxa_z8i0isR0Eijp0PSRRfG6CAU",
+    authDomain: "bi-solucoes.firebaseapp.com",
+    projectId: "bi-solucoes",
+    storageBucket: "bi-solucoes.firebasestorage.app",
+    messagingSenderId: "761304787557",
+    appId: "1:761304787557:web:f4ff7f285ffb5792bab48c",
+    measurementId: "G-6DNLBKCWXB"
+  };
+
+  // Inicializar Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // Função para embaralhar array (algoritmo Fisher-Yates)
+  function embaralharArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  // Função para carregar produtos populares
+  async function carregarProdutosPopulares() {
+    const produtosContainer = document.getElementById('produtos-populares');
+    produtosContainer.innerHTML = '<p>Carregando produtos...</p>';
+
+    try {
+      const querySnapshot = await db.collection('produtos').get();
+      let produtos = [];
+
+      // Montar lista de produtos
+      querySnapshot.forEach(doc => {
+        const produto = doc.data();
+        produtos.push({
+          id: doc.id,
+          nome: produto.nome,
+          descricao: produto.descricao || 'Sem descrição disponível',
+          imagem: produto.imagem || 'https://via.placeholder.com/150',
+          categoria: produto.categoria || 'Categoria não informada'
+        });
+      });
+
+      // Embaralhar e limitar aos primeiros 9 produtos
+      produtos = embaralharArray(produtos).slice(0, 9);
+
+      // Renderizar os produtos no HTML
+      produtosContainer.innerHTML = '';
+      produtos.forEach(produto => {
+        const produtoHTML = `
+          <div class="col-sm-4 col-lg-4 text-center item mb-4">
+            <a href="shop-single.html?id=${produto.id}">
+              <img src="${produto.imagem}" 
+                   alt="${produto.nome}" 
+                   style="width: 150px; height: 150px; object-fit: cover;">
+            </a>
+            <h5>${produto.nome}</h5>
+            <p>${produto.descricao}</p>
+            <p class="price">${produto.categoria}</p>
+          </div>
+        `;
+        produtosContainer.innerHTML += produtoHTML;
+      });
+
+    } catch (error) {
+      console.error("Erro ao carregar produtos:", error);
+      produtosContainer.innerHTML = '<p>Erro ao carregar produtos. Tente novamente mais tarde.</p>';
+    }
+  }
+
+  // Chamar a função ao carregar a página
+  document.addEventListener('DOMContentLoaded', carregarProdutosPopulares);
+</script>
+ 
+
+  <script src="js/jquery-3.3.1.min.js"></script>
+  <script src="js/jquery-ui.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/owl.carousel.min.js"></script>
+  <script src="js/jquery.magnific-popup.min.js"></script>
+  <script src="js/aos.js"></script>
+  <script src="js/main.js"></script>
+</body>
+
+</html>

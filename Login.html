@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login e Cadastro</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore-compat.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f9fb;
+            color: #333;
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #00ABBD;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 171, 189, 0.3);
+            transition: background 0.3s;
+        }
+
+        .back-button:hover {
+            background: #008a9c;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 171, 189, 0.3);
+        }
+
+        .tab {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .tab a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 12px 20px;
+            margin: 5px 0;
+            background: linear-gradient(135deg, #00ABBD, #007BFF);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+            transition: all 0.3s ease;
+            width: auto;
+        }
+
+        .tab a:hover {
+            background: linear-gradient(135deg, #007BFF, #00ABBD);
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
+        }
+
+        .form {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .form.active {
+            display: block;
+        }
+
+        .form h2 {
+            text-align: center;
+            color: #00ABBD;
+            margin-bottom: 20px;
+        }
+
+        .form input {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form input:focus {
+            border-color: #00ABBD;
+            outline: none;
+        }
+
+        .form button {
+            width: 100%;
+            padding: 12px;
+            background: #00ABBD;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .form button:hover {
+            background: #008a9c;
+        }
+
+        .switch {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .switch a {
+            text-decoration: none;
+            color: #00ABBD;
+            font-weight: bold;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .switch a:hover {
+            color: #008a9c;
+        }
+
+        .forgot-password {
+            text-align: left;
+            margin-top: -10px;
+            margin-bottom: 20px;
+        }
+
+        .forgot-password a {
+            text-decoration: none;
+            color: #00ABBD;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .forgot-password a:hover {
+            color: #008a9c;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .captcha {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.captcha input {
+    margin-right: 10px;
+    width: auto;
+}
+
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">Voltar</a>
+
+    <div class="container">
+        <div class="tab">
+            <a onclick="showForm('loginEmpresa')">Login Empresa</a>
+            <a onclick="showForm('loginUsuario')">Login Usuário</a>
+        </div>
+
+        <form id="loginEmpresa" class="form active">
+            <h2>Login Empresa</h2>
+            <input id="loginCnpjEmail" type="text" placeholder="CNPJ ou E-mail" required>
+            <input id="loginSenhaEmpresa" type="password" placeholder="Senha" required>
+            <button type="button" onclick="loginEmpresa()">Entrar</button>
+            <div class="switch">
+                <a onclick="showForm('cadastroEmpresa')">Não tem conta? Cadastre-se</a>
+            </div>
+        </form>
+
+        <form id="loginUsuario" class="form">
+            <h2>Login Usuário</h2>
+            <input id="loginEmailUsuario" type="email" placeholder="E-mail" required>
+            <input id="loginSenhaUsuario" type="password" placeholder="Senha" required>
+            <div class="captcha">
+              <input type="checkbox" id="captchaCheckbox" required>
+              <label for="captchaCheckbox">Não sou um robô</label>
+          </div>
+            <button type="button" onclick="loginUsuario()">Entrar</button>
+            <div class="switch">
+                <a onclick="showForm('cadastroUsuario')">Não tem conta? Cadastre-se</a>
+            </div>
+        </form>
+
+        <form id="cadastroEmpresa" class="form">
+            <h2>Cadastro Empresa</h2>
+            <input id="cadastroCnpj" type="text" placeholder="CNPJ" required>
+            <input id="cadastroRazaoSocial" type="text" placeholder="Razão Social" required>
+            <input id="cadastroEndereco" type="text" placeholder="Endereço" required>
+            <input id="cadastroNumero" type="text" placeholder="Número" required>
+            <input id="cadastroCep" type="text" placeholder="CEP" required>
+            <input id="cadastroEmailEmpresa" type="email" placeholder="E-mail" required>
+            <input id="cadastroSenhaEmpresa" type="password" placeholder="Senha" required>
+            <input id="cadastroToken" type="text" placeholder="Token" required>
+            <button type="button" onclick="cadastrarEmpresa()">Cadastrar</button>
+        </form>
+
+        <form id="cadastroUsuario" class="form">
+            <h2>Cadastro Usuário</h2>
+            <input id="cadastroNomeUsuario" type="text" placeholder="Nome Completo" required>
+            <input id="cadastroEmailUsuario" type="email" placeholder="E-mail" required>
+            <input id="cadastroSenhaUsuario" type="password" placeholder="Senha" required>
+     
+          
+            <button type="button" onclick="cadastrarUsuario()">Cadastrar</button>
+        </form>
+    </div>
+    
+  
+    <script>
+
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTaKdJDxa_z8i0isR0Eijp0PSRRfG6CAU",
+            authDomain: "bi-solucoes.firebaseapp.com",
+            projectId: "bi-solucoes",
+            storageBucket: "bi-solucoes.firebasestorage.app",
+            messagingSenderId: "761304787557",
+            appId: "1:761304787557:web:f4ff7f285ffb5792bab48c",
+            measurementId: "G-6DNLBKCWXB"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const validTokens = ["TOKEN123", "EMPRESA2024"]; // Lista de tokens válidos
+
+        async function cadastrarEmpresa() {
+            const cnpj = document.getElementById('cadastroCnpj').value;
+            const razaoSocial = document.getElementById('cadastroRazaoSocial').value;
+            const endereco = document.getElementById('cadastroEndereco').value;
+            const numero = document.getElementById('cadastroNumero').value;
+            const cep = document.getElementById('cadastroCep').value;
+            const email = document.getElementById('cadastroEmailEmpresa').value;
+            const senha = document.getElementById('cadastroSenhaEmpresa').value;
+            const token = document.getElementById('cadastroToken').value;
+
+            if (!validTokens.includes(token)) {
+            alert("Token inválido. Entre em contato para obter um token válido.");
+            return;
+        }
+
+            try {
+                await db.collection('empresas').add({
+                    cnpj,
+                    razaoSocial,
+                    endereco: {
+                        endereco,
+                        numero,
+                        cep
+                    },
+                    email,
+                    senha,
+                    token,
+                    dataCriacao: firebase.firestore.FieldValue.serverTimestamp(),
+                });
+                alert('Empresa cadastrada com sucesso!');
+                document.getElementById('cadastroEmpresa').reset();
+            } catch (error) {
+                console.error('Erro ao cadastrar empresa:', error);
+                alert('Erro ao cadastrar empresa. Tente novamente.');
+            }
+        }
+
+        async function cadastrarUsuario() {
+            const nome = document.getElementById('cadastroNomeUsuario').value;
+            const email = document.getElementById('cadastroEmailUsuario').value;
+            const senha = document.getElementById('cadastroSenhaUsuario').value;
+
+            try {
+                await db.collection('users').add({
+                    nome,
+                    email,
+                    senha,
+                    dataCriacao: firebase.firestore.FieldValue.serverTimestamp(),
+                });
+                alert('Usuário cadastrado com sucesso!');
+                document.getElementById('cadastroUsuario').reset();
+            } catch (error) {
+                console.error('Erro ao cadastrar usuário:', error);
+                alert('Erro ao cadastrar usuário. Tente novamente.');
+            }
+        }
+
+        async function loginEmpresa() {
+    const emailOuCnpj = document.getElementById('loginCnpjEmail').value;
+    const senha = document.getElementById('loginSenhaEmpresa').value;
+
+    try {
+        const snapshot = await db.collection('empresas')
+            .where('email', '==', emailOuCnpj)
+            .where('senha', '==', senha)
+            .get();
+
+        if (!snapshot.empty) {
+            const empresa = snapshot.docs[0].data();
+            const empresaId = snapshot.docs[0].id;
+
+            sessionStorage.setItem('empresaId', empresaId); // Salva o ID da empresa logada
+            alert('Login realizado com sucesso!');
+            window.location.href = 'cadastroprodutos.html'; // Redireciona para a página de cadastro de produtos
+        } else {
+            alert('CNPJ/E-mail ou senha incorretos.');
+        }
+    } catch (error) {
+        console.error('Erro ao realizar login de empresa:', error);
+        alert('Erro ao realizar login. Tente novamente.');
+    }
+}
+
+        async function loginUsuario() {
+            const email = document.getElementById('loginEmailUsuario').value;
+            const senha = document.getElementById('loginSenhaUsuario').value;
+
+            try {
+                const snapshot = await db.collection('users')
+                    .where('email', '==', email)
+                    .where('senha', '==', senha)
+                    .get();
+
+                if (!snapshot.empty) {
+                    alert('Login de usuário realizado com sucesso!');
+                } else {
+                    alert('E-mail ou senha incorretos.');
+                }
+            } catch (error) {
+                console.error('Erro ao realizar login de usuário:', error);
+                alert('Erro ao realizar login de usuário. Tente novamente.');
+            }
+        }
+
+        function showForm(formId) {
+            document.querySelectorAll('.form').forEach(form => {
+                form.classList.remove('active');
+            });
+            document.getElementById(formId).classList.add('active');
+        }
+    </script>
+</body>
+</html>

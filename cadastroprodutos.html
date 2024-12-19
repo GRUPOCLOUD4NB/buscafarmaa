@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Produtos</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore-compat.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f9fb;
+            color: #333;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 500px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 171, 189, 0.3);
+        }
+
+        h2 {
+            text-align: center;
+            color: #00ABBD;
+            margin-bottom: 20px;
+        }
+
+        input, select {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #00ABBD;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #00ABBD;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #008a9c;
+        }
+
+        .logout-button {
+            background: #FF6B6B;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .logout-button:hover {
+            background: #D9534F;
+        }
+    </style>
+</head>
+<body>
+    <button type="button" class="logout-button" onclick="logout()">Sair</button>
+    <div class="container">
+        <h2>Cadastro de Produtos</h2>
+        <form id="produtoForm">
+            <input type="text" id="nomeProduto" placeholder="Nome do Produto" required>
+            <input type="text" id="descricaoProduto" placeholder="Descrição" required>
+            <input type="text" id="categoriaProduto" placeholder="Categoria" required>
+            <input type="text" id="marcaProduto" placeholder="Marca" required>
+            <input type="text" id="fabricanteProduto" placeholder="Fabricante" required>
+            <label for="validadeProduto">Validade</label>
+            <input type="date" id="validadeProduto" required>
+            <input type="number" id="precoProduto" placeholder="Preço" step="0.01" required>
+            <input type="number" id="quantidadeEstoque" placeholder="Quantidade em Estoque" required>
+            <input type="url" id="imagemProduto" placeholder="Link para a Imagem">
+            <input type="url" id="bulaProduto" placeholder="Link para a Bula">
+            <button type="button" onclick="cadastrarProduto()">Cadastrar Produto</button>
+            <div class="mt-4">
+                <button type="button" class="btn btn-secondary" onclick="irParaEdicao()">Editar Produtos</button>
+              </div>
+              
+        </form>
+    </div>
+
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTaKdJDxa_z8i0isR0Eijp0PSRRfG6CAU",
+            authDomain: "bi-solucoes.firebaseapp.com",
+            projectId: "bi-solucoes",
+            storageBucket: "bi-solucoes.firebasestorage.app",
+            messagingSenderId: "761304787557",
+            appId: "1:761304787557:web:f4ff7f285ffb5792bab48c",
+            measurementId: "G-6DNLBKCWXB"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        async function cadastrarProduto() {
+    const nome = document.getElementById('nomeProduto').value;
+    const descricao = document.getElementById('descricaoProduto').value;
+    const categoria = document.getElementById('categoriaProduto').value;
+    const marca = document.getElementById('marcaProduto').value;
+    const fabricante = document.getElementById('fabricanteProduto').value;
+    const validade = document.getElementById('validadeProduto').value;
+    const preco = parseFloat(document.getElementById('precoProduto').value);
+    const quantidade = parseInt(document.getElementById('quantidadeEstoque').value);
+    const imagemUrl = document.getElementById('imagemProduto').value || null;
+    const bula = document.getElementById('bulaProduto').value || null;
+    const empresaId = sessionStorage.getItem('empresaId'); // ID da empresa logada
+
+    if (!empresaId) {
+        alert('Você precisa estar logado como empresa para cadastrar um produto.');
+        return;
+    }
+
+    try {
+        // Buscar dados da empresa logada
+        const empresaRef = await db.collection('empresas').doc(empresaId).get();
+        if (!empresaRef.exists) {
+            alert('Empresa não encontrada.');
+            return;
+        }
+
+        const empresa = empresaRef.data();
+
+        // Salvar produto no Firestore
+        const produtoRef = await db.collection('produtos').add({
+            nome,
+            descricao,
+            categoria,
+            marca,
+            fabricante,
+            validade,
+            preco,
+            quantidade,
+            imagemUrl,
+            bula,
+            empresaId,
+            dataCriacao: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        console.log(`Produto ${nome} cadastrado com ID: ${produtoRef.id}`);
+
+        // Criar link na tabela de estoque
+        const estoqueRef = await db.collection('estoque').add({
+            idProduto: produtoRef.id,
+            nomeProduto: nome,
+            idEmpresa: empresaId,
+            nomeFarmacia: empresa.razaoSocial,
+            endereco: `${empresa.endereco.logradouro}, ${empresa.endereco.numero} - ${empresa.endereco.cep}`,
+            quantidade,
+            preco
+        });
+
+        console.log(`Estoque vinculado ao produto ${nome} com ID de estoque: ${estoqueRef.id}`);
+
+        alert('Produto e estoque cadastrados com sucesso!');
+        document.getElementById('produtoForm').reset();
+    } catch (error) {
+        console.error('Erro ao cadastrar produto:', error);
+        alert('Erro ao cadastrar produto. Tente novamente.');
+    }
+}
+function irParaEdicao() {
+  window.location.href = "Alteração.html"; // Substitua pelo nome real do arquivo
+}
+
+
+        function logout() {
+            sessionStorage.removeItem('empresaId');
+            window.location.href = 'login.html';
+        }
+
+        // Verifica se a empresa está logada
+        window.onload = () => {
+            const empresaId = sessionStorage.getItem('empresaId');
+            if (!empresaId) {
+                alert('Você precisa estar logado como empresa para acessar esta página.');
+                window.location.href = 'login.html';
+            }
+        };
+    </script>
+</body>
+</html>

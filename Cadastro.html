@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Cadastro de Farmácias</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link href="https://fonts.googleapis.com/css?family=Rubik:400,700|Crimson+Text:400,400i" rel="stylesheet">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+  <div class="container py-5">
+    <h2 class="mb-4">Cadastrar Nova Farmácia</h2>
+    <form id="farmaciaForm">
+      <div class="form-group">
+        <label for="nomeFarmacia">Nome da Farmácia</label>
+        <input type="text" id="nomeFarmacia" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="cnpj">CNPJ</label>
+        <input type="text" id="cnpj" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="endereco">Endereço</label>
+        <input type="text" id="endereco" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="cidade">Cidade</label>
+        <input type="text" id="cidade" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="estado">Estado</label>
+        <input type="text" id="estado" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="cep">CEP</label>
+        <input type="text" id="cep" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="telefone">Telefone</label>
+        <input type="tel" id="telefone" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="geolocalizacao">Geolocalização (Latitude, Longitude)</label>
+        <input type="text" id="geolocalizacao" class="form-control" placeholder="Exemplo: -23.55052, -46.633308" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Cadastrar</button>
+    </form>
+  </div>
+
+  <script>
+    // Configuração do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBTaKdJDxa_z8i0isR0Eijp0PSRRfG6CAU",
+      authDomain: "bi-solucoes.firebaseapp.com",
+      projectId: "bi-solucoes",
+      storageBucket: "bi-solucoes.firebasestorage.app",
+      messagingSenderId: "761304787557",
+      appId: "1:761304787557:web:f4ff7f285ffb5792bab48c",
+      measurementId: "G-6DNLBKCWXB"
+    };
+
+    // Inicializa o Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Envia os dados para o Firestore
+    document.getElementById('farmaciaForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const nomeFarmacia = document.getElementById('nomeFarmacia').value;
+      const cnpj = document.getElementById('cnpj').value;
+      const endereco = document.getElementById('endereco').value;
+      const cidade = document.getElementById('cidade').value;
+      const estado = document.getElementById('estado').value;
+      const cep = document.getElementById('cep').value;
+      const telefone = document.getElementById('telefone').value;
+      const geolocalizacao = document.getElementById('geolocalizacao').value.split(',').map(coord => parseFloat(coord.trim()));
+
+      if (geolocalizacao.length !== 2 || isNaN(geolocalizacao[0]) || isNaN(geolocalizacao[1])) {
+        alert('Por favor, insira coordenadas válidas (latitude, longitude).');
+        return;
+      }
+
+      try {
+        await db.collection('farmacias').add({
+          nomeFarmacia,
+          cnpj,
+          endereco,
+          cidade,
+          estado,
+          cep,
+          telefone,
+          geolocalizacao: { latitude: geolocalizacao[0], longitude: geolocalizacao[1] },
+          dataCriacao: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+
+        alert('Farmácia cadastrada com sucesso!');
+        document.getElementById('farmaciaForm').reset();
+      } catch (error) {
+        console.error('Erro ao cadastrar a farmácia:', error);
+        alert('Erro ao cadastrar a farmácia. Tente novamente.');
+      }
+    });
+  </script>
+</body>
+
+</html>

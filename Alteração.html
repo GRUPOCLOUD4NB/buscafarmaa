@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Editar Produto</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link href="https://fonts.googleapis.com/css?family=Rubik:400,700|Crimson+Text:400,400i" rel="stylesheet">
+  <link rel="stylesheet" href="fonts/icomoon/style.css">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="container py-5">
+    <h1 class="text-center">Editar Produto</h1>
+
+    <!-- Seleção de Produto -->
+    <div class="form-group">
+      <label for="produtoSelect">Selecione o Produto:</label>
+      <select id="produtoSelect" class="form-control">
+        <option value="">Selecione um produto</option>
+        <!-- Opções serão preenchidas dinamicamente -->
+      </select>
+    </div>
+
+    <!-- Formulário de Edição -->
+    <form id="editarProdutoForm" style="display: none;">
+      <h3 class="mt-4">Editar Informações do Produto</h3>
+
+      <div class="form-group">
+        <label for="nomeProduto">Nome</label>
+        <input type="text" class="form-control" id="nomeProduto">
+      </div>
+
+      <div class="form-group">
+        <label for="descricaoProduto">Descrição</label>
+        <textarea class="form-control" id="descricaoProduto"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="categoriaProduto">Categoria</label>
+        <input type="text" class="form-control" id="categoriaProduto">
+      </div>
+
+      <div class="form-group">
+        <label for="marcaProduto">Marca</label>
+        <input type="text" class="form-control" id="marcaProduto">
+      </div>
+
+      <div class="form-group">
+        <label for="fabricanteProduto">Fabricante</label>
+        <input type="text" class="form-control" id="fabricanteProduto">
+      </div>
+
+      <div class="form-group">
+        <label for="validadeProduto">Validade</label>
+        <input type="date" class="form-control" id="validadeProduto">
+      </div>
+
+      <div class="form-group">
+        <label for="precoProduto">Preço</label>
+        <input type="number" class="form-control" id="precoProduto" step="0.01">
+      </div>
+
+      <div class="form-group">
+        <label for="quantidadeProduto">Quantidade</label>
+        <input type="number" class="form-control" id="quantidadeProduto">
+      </div>
+
+      <div class="form-group">
+        <label for="imagemProduto">URL da Imagem</label>
+        <input type="text" class="form-control" id="imagemProduto">
+      </div>
+
+      <div class="form-group">
+        <label for="bulaProduto">URL da Bula</label>
+        <input type="text" class="form-control" id="bulaProduto">
+      </div>
+
+      <button type="button" class="btn btn-primary" onclick="salvarAlteracoes()">Salvar Alterações</button>
+    </form>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBTaKdJDxa_z8i0isR0Eijp0PSRRfG6CAU",
+      authDomain: "bi-solucoes.firebaseapp.com",
+      projectId: "bi-solucoes",
+      storageBucket: "bi-solucoes.firebasestorage.app",
+      messagingSenderId: "761304787557",
+      appId: "1:761304787557:web:f4ff7f285ffb5792bab48c",
+      measurementId: "G-6DNLBKCWXB"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Carregar produtos para o dropdown
+    async function carregarProdutos() {
+      const produtoSelect = document.getElementById('produtoSelect');
+
+      try {
+        const produtosSnapshot = await db.collection('produtos').get();
+        produtosSnapshot.forEach(doc => {
+          const option = document.createElement('option');
+          option.value = doc.id;
+          option.textContent = doc.data().nome;
+          produtoSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Erro ao carregar produtos:', error);
+      }
+    }
+
+    // Carregar informações do produto selecionado
+    async function carregarProdutoSelecionado() {
+      const produtoId = document.getElementById('produtoSelect').value;
+      if (!produtoId) return;
+
+      try {
+        const produtoDoc = await db.collection('produtos').doc(produtoId).get();
+        if (!produtoDoc.exists) {
+          alert('Produto não encontrado.');
+          return;
+        }
+
+        const produto = produtoDoc.data();
+        document.getElementById('nomeProduto').value = produto.nome || '';
+        document.getElementById('descricaoProduto').value = produto.descricao || '';
+        document.getElementById('categoriaProduto').value = produto.categoria || '';
+        document.getElementById('marcaProduto').value = produto.marca || '';
+        document.getElementById('fabricanteProduto').value = produto.fabricante || '';
+        document.getElementById('validadeProduto').value = produto.validade || '';
+        document.getElementById('precoProduto').value = produto.preco || '';
+        document.getElementById('quantidadeProduto').value = produto.quantidade || '';
+        document.getElementById('imagemProduto').value = produto.imagemUrl || '';
+        document.getElementById('bulaProduto').value = produto.bula || '';
+
+        document.getElementById('editarProdutoForm').style.display = 'block';
+      } catch (error) {
+        console.error('Erro ao carregar produto selecionado:', error);
+      }
+    }
+
+    // Salvar alterações no produto
+    async function salvarAlteracoes() {
+      const produtoId = document.getElementById('produtoSelect').value;
+      if (!produtoId) return;
+
+      const produtoAtualizado = {
+        nome: document.getElementById('nomeProduto').value,
+        descricao: document.getElementById('descricaoProduto').value,
+        categoria: document.getElementById('categoriaProduto').value,
+        marca: document.getElementById('marcaProduto').value,
+        fabricante: document.getElementById('fabricanteProduto').value,
+        validade: document.getElementById('validadeProduto').value,
+        preco: parseFloat(document.getElementById('precoProduto').value),
+        quantidade: parseInt(document.getElementById('quantidadeProduto').value),
+        imagemUrl: document.getElementById('imagemProduto').value,
+        bula: document.getElementById('bulaProduto').value
+      };
+
+      try {
+        await db.collection('produtos').doc(produtoId).update(produtoAtualizado);
+        alert('Produto atualizado com sucesso!');
+        document.getElementById('editarProdutoForm').reset();
+        document.getElementById('editarProdutoForm').style.display = 'none';
+      } catch (error) {
+        console.error('Erro ao salvar alterações:', error);
+        alert('Erro ao salvar alterações. Tente novamente.');
+      }
+    }
+
+    // Inicializar a página
+    document.addEventListener('DOMContentLoaded', () => {
+      carregarProdutos();
+      document.getElementById('produtoSelect').addEventListener('change', carregarProdutoSelecionado);
+    });
+  </script>
+</body>
+
+</html>
